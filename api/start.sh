@@ -11,10 +11,20 @@ if [ ! -f "index.php" ]; then
     exit 1
 fi
 
+# Obtener el puerto de la variable de entorno o usar 8080 por defecto
+PORT=${PORT:-8080}
+
+# Verificar que PORT es un número
+if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: PORT debe ser un número, recibido: $PORT"
+    exit 1
+fi
+
 # Iniciar servidor PHP
 echo "Iniciando servidor PHP desde: $(pwd)"
+echo "Puerto: $PORT"
 echo "Archivos en /app:"
 ls -la
 
-php -S 0.0.0.0:${PORT:-8080} -t . index.php
+exec php -S 0.0.0.0:"$PORT" -t . index.php
 

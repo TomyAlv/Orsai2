@@ -26,5 +26,6 @@ RUN chmod +x /app/start.sh
 EXPOSE 8080
 
 # Comando de inicio usando el script
-CMD ["/app/start.sh"]
+# Usar forma de shell para que las variables de entorno se expandan correctamente
+CMD ["/bin/bash", "/app/start.sh"]
 
