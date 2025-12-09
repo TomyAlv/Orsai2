@@ -1,0 +1,21 @@
+# Configuración de Render para el proyecto Orsai
+# Este archivo permite configurar múltiples servicios
+
+services:
+  # Backend PHP
+  - type: web
+    name: orsai-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: API_FOOTBALL_KEY
+        sync: false  # Configurar manualmente en Render Dashboard
+      - key: JWT_SECRET
+        sync: false  # Configurar manualmente en Render Dashboard
+      - key: DB_PATH
+        value: /app/db/orsai.sqlite
+    buildCommand: ""  # Dockerfile maneja el build
+    startCommand: ""  # Dockerfile define el CMD
+    healthCheckPath: /?action=ping
+

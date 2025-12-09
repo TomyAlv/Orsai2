@@ -315,6 +315,8 @@ export const environment = {
 
 ### Alternativa: Render (Más fácil para PHP)
 
+**⚠️ IMPORTANTE**: Render requiere un `Dockerfile` en la raíz del repositorio o usar `render.yaml` para configuración.
+
 1. Ve a https://render.com
 2. "New" → "Web Service"
 3. Conecta tu repositorio de GitHub
