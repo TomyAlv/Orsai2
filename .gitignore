@@ -83,3 +83,6 @@ public/index.csr.html
 
 # Archivos de prueba
 api/info.php
+
+# Directorio de deployment (generado por scripts)
+deploy_public_html/

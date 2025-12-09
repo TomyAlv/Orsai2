@@ -1,0 +1,25 @@
+# Configuración para GitLab CI/CD (si DonWeb lo soporta)
+# Alternativamente, puede usarse para otros sistemas CI/CD
+
+stages:
+  - build
+  - deploy
+
+build_frontend:
+  stage: build
+  image: node:18
+  script:
+    - cd frontend
+    - npm install
+    - npm run build -- --configuration production
+  artifacts:
+    paths:
+      - frontend/dist/browser/
+    expire_in: 1 hour
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deployment configurado en DonWeb/Ferozo"
+    - echo "Los archivos se desplegarán automáticamente desde GitHub"
+
