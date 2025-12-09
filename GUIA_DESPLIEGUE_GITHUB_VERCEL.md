@@ -276,11 +276,17 @@ export const environment = {
 2. Inicia sesión con GitHub
 3. "New Project" → "Deploy from GitHub repo"
 4. Selecciona tu repositorio `orsai`
-5. **Configuración**:
+5. **Configuración IMPORTANTE**:
    - **Root Directory**: `api`
-   - **Build Command**: (vacío, PHP no necesita build)
+   - **Build Command**: (dejar vacío)
    - **Start Command**: `php -S 0.0.0.0:$PORT -t . index.php`
    - **Port**: Railway asigna automáticamente (usar variable `$PORT`)
+   - **Nixpacks Config Path**: `nixpacks.toml` (si Railway lo permite)
+   
+   **⚠️ CRÍTICO**: Si Railway muestra logs de Caddy u otro servidor (no PHP), significa que no está detectando PHP correctamente. Solución:
+   - Ve a Settings → Deploy
+   - Cambia el **Builder** a "NIXPACKS" explícitamente
+   - O usa "DOCKERFILE" si Nixpacks no funciona
 
 6. **Variables de Entorno** (Settings → Variables):
    ```
@@ -428,6 +434,41 @@ define('DB_PATH', getenv('DB_PATH') ?: __DIR__ . '/../db/orsai.sqlite');
 - Verifica que `DB_PATH` en `config.php` use la ruta correcta
 - Ejecuta `init_db.php` después del despliegue: `https://tu-url.railway.app/init_db.php`
 - O migra a PostgreSQL/MySQL si SQLite no funciona
+
+### Error: Railway muestra logs de Caddy (no PHP)
+
+**Síntoma**: Los logs muestran "Caddy", "HTTP/2", "TLS", etc., en lugar de PHP.
+
+**Causa**: Railway no está detectando que es una aplicación PHP.
+
+**Solución**:
+
+1. **Opción 1 - Forzar Nixpacks con configuración**:
+   - Asegúrate de que `api/nixpacks.toml` existe en el repositorio
+   - En Railway: Settings → Deploy → **Builder**: Selecciona "NIXPACKS" explícitamente
+   - **Nixpacks Config Path**: `nixpacks.toml`
+   - **Start Command**: `php -S 0.0.0.0:$PORT -t . index.php`
+
+2. **Opción 2 - Usar Dockerfile**:
+   - Asegúrate de que `api/Dockerfile` existe en el repositorio
+   - En Railway: Settings → Deploy → **Builder**: Cambia a "DOCKERFILE"
+   - Railway usará el Dockerfile automáticamente
+
+3. **Opción 3 - Verificar archivos en repositorio**:
+   ```bash
+   # Verificar que los archivos estén en GitHub
+   ls api/ | grep -E "(nixpacks|Dockerfile|Procfile|railway.json)"
+   ```
+   Todos estos archivos deben estar presentes.
+
+4. **Opción 4 - Redeploy después de cambios**:
+   - Después de subir los archivos a GitHub
+   - En Railway: Deployments → "Redeploy"
+   - O haz un commit vacío para forzar redeploy:
+     ```bash
+     git commit --allow-empty -m "Force Railway redeploy"
+     git push origin main
+     ```
 
 ### Error: "Application failed to respond" en Railway
 
