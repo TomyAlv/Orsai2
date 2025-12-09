@@ -279,35 +279,69 @@ export const environment = {
 5. **Configuración**:
    - **Root Directory**: `api`
    - **Build Command**: (vacío, PHP no necesita build)
-   - **Start Command**: (Railway detecta PHP automáticamente)
-   - **Port**: 80 o el que Railway asigne
+   - **Start Command**: `php -S 0.0.0.0:$PORT -t . index.php`
+   - **Port**: Railway asigna automáticamente (usar variable `$PORT`)
 
-6. **Variables de Entorno**:
+6. **Variables de Entorno** (Settings → Variables):
    ```
    API_FOOTBALL_KEY=tu_api_key_aqui
-   JWT_SECRET=tu_secret_jwt_aqui
+   JWT_SECRET=tu_secret_jwt_seguro_aqui
+   DB_PATH=/app/db/orsai.sqlite
+   PORT=80
    ```
+   **Nota**: Railway asigna el puerto automáticamente, no necesitas configurarlo manualmente.
 
 7. **Base de Datos**:
-   - Railway puede crear una base de datos PostgreSQL
-   - O puedes usar SQLite (archivo en el servidor)
+   - **SQLite**: Se crea automáticamente en `/app/db/orsai.sqlite`
+   - Asegúrate de que la carpeta `db/` tenga permisos de escritura
+   - O usa PostgreSQL de Railway (requiere migración de código)
 
-8. Railway te dará una URL como: `https://orsai-backend.railway.app`
+8. **Archivos Necesarios** (ya incluidos en el proyecto):
+   - `api/railway.json` - Configuración de Railway
+   - `api/Procfile` - Comando de inicio alternativo
+   - `api/.htaccess` - Configuración Apache (opcional)
 
-### Alternativa: Render
+9. Railway te dará una URL como: `https://orsai-backend.railway.app`
+
+10. **Inicializar Base de Datos**:
+    - Una vez desplegado, visita: `https://tu-url.railway.app/init_db.php`
+    - O ejecuta el script manualmente desde Railway CLI
+
+### Alternativa: Render (Más fácil para PHP)
 
 1. Ve a https://render.com
 2. "New" → "Web Service"
 3. Conecta tu repositorio de GitHub
-4. **Configuración**:
+4. Selecciona tu repositorio `orsai`
+5. **Configuración**:
    - **Name**: `orsai-backend`
    - **Environment**: PHP
-   - **Build Command**: (vacío)
-   - **Start Command**: `php -S 0.0.0.0:$PORT`
+   - **Region**: Elige el más cercano
+   - **Branch**: `main` (o la rama que uses)
    - **Root Directory**: `api`
+   - **Build Command**: (dejar vacío)
+   - **Start Command**: `php -S 0.0.0.0:$PORT -t . index.php`
+   - **Plan**: Free (o el que prefieras)
 
-5. Agregar variables de entorno
-6. Render te dará una URL
+6. **Variables de Entorno** (Environment Variables):
+   ```
+   API_FOOTBALL_KEY=tu_api_key_aqui
+   JWT_SECRET=tu_secret_jwt_seguro_aqui
+   DB_PATH=/opt/render/project/src/api/db/orsai.sqlite
+   ```
+
+7. **Base de Datos**:
+   - Render permite SQLite en el sistema de archivos
+   - La ruta `/opt/render/project/src/api/db/` es persistente
+   - Ejecuta `init_db.php` después del primer despliegue
+
+8. Clic en "Create Web Service"
+9. Render te dará una URL como: `https://orsai-backend.onrender.com`
+
+**Ventajas de Render sobre Railway para PHP**:
+- Mejor soporte nativo para PHP
+- Más fácil de configurar
+- Documentación más clara para PHP
 
 ---
 
@@ -391,7 +425,63 @@ define('DB_PATH', getenv('DB_PATH') ?: __DIR__ . '/../db/orsai.sqlite');
 
 **Solución**: 
 - En Railway/Render, asegúrate de que la carpeta `db/` tenga permisos de escritura
+- Verifica que `DB_PATH` en `config.php` use la ruta correcta
+- Ejecuta `init_db.php` después del despliegue: `https://tu-url.railway.app/init_db.php`
 - O migra a PostgreSQL/MySQL si SQLite no funciona
+
+### Error: "Application failed to respond" en Railway
+
+**Solución paso a paso**:
+
+1. **Verificar Start Command en Railway**:
+   - Ve a tu proyecto en Railway
+   - Settings → Deploy
+   - **Start Command** debe ser: `php -S 0.0.0.0:$PORT -t . index.php`
+   - **Root Directory** debe ser: `api`
+
+2. **Verificar archivos necesarios**:
+   - Asegúrate de que `api/index.php` existe en el repositorio
+   - Verifica que `api/railway.json` o `api/Procfile` estén en el repositorio
+   - Estos archivos ya están incluidos en el proyecto
+
+3. **Revisar logs en Railway**:
+   - Ve a "Deployments" → Selecciona el último deployment → "View Logs"
+   - Busca errores de PHP, rutas incorrectas, o problemas de permisos
+   - Los logs mostrarán el error específico
+
+4. **Probar endpoint de prueba**:
+   - Una vez desplegado, visita: `https://tu-url.railway.app/test_railway.php`
+   - Este archivo verifica que PHP funciona y muestra información del servidor
+   - Si este endpoint funciona, el problema está en `index.php`
+
+5. **Verificar sintaxis PHP**:
+   ```bash
+   cd api
+   php -l index.php
+   ```
+   Debe mostrar "No syntax errors detected"
+
+6. **Probar localmente con servidor PHP embebido**:
+   ```bash
+   cd api
+   php -S localhost:8000 index.php
+   ```
+   Luego visita: `http://localhost:8000?action=ping`
+   Si funciona localmente, el problema es de configuración en Railway
+
+7. **Verificar variables de entorno**:
+   - Railway inyecta `$PORT` automáticamente
+   - No necesitas configurarla manualmente
+   - Verifica otras variables: `API_FOOTBALL_KEY`, `JWT_SECRET`
+
+8. **Verificar permisos de base de datos**:
+   - La carpeta `db/` debe tener permisos de escritura
+   - Railway puede requerir crear la carpeta manualmente
+   - Ejecuta `init_db.php` después del despliegue
+
+9. **Si nada funciona, usar Render como alternativa**:
+   - Render tiene mejor soporte para PHP
+   - Sigue las instrucciones en la sección "Alternativa: Render"
 
 ---
 

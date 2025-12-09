@@ -6,14 +6,22 @@
  */
 
 // Base de datos SQLite
-define('DB_PATH', __DIR__ . '/../db/orsai.sqlite');
+// En Railway, usar variable de entorno o ruta relativa
+$dbPath = getenv('DB_PATH') ?: __DIR__ . '/../db/orsai.sqlite';
+// Asegurar que el directorio existe
+$dbDir = dirname($dbPath);
+if (!is_dir($dbDir)) {
+    mkdir($dbDir, 0755, true);
+}
+define('DB_PATH', $dbPath);
 
 // Credenciales de administrador por defecto
 define('ADMIN_DEFAULT_USER', 'admin');
 define('ADMIN_DEFAULT_PASS', 'admin123');
 
 // Configuración de API-Football (para obtener partidos)
-define('API_FOOTBALL_KEY', 'acba994d75337c0c2d55700e2f785c50');
+// Usar variable de entorno en producción, valor por defecto para desarrollo
+define('API_FOOTBALL_KEY', getenv('API_FOOTBALL_KEY') ?: 'acba994d75337c0c2d55700e2f785c50');
 define('API_FOOTBALL_BASE_URL', 'https://v3.football.api-sports.io');
 
 // Configuración de ESPN (para noticias de fútbol)

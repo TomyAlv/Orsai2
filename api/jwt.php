@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-// Clave secreta para JWT (en producción debe estar en variables de entorno)
-define('JWT_SECRET', 'orsai_secret_key_2024_change_in_production');
+// Clave secreta para JWT (usar variable de entorno en producción)
+define('JWT_SECRET', getenv('JWT_SECRET') ?: 'orsai_secret_key_2024_change_in_production');
 
 function base64UrlEncode($data) {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
