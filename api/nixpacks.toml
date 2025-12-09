@@ -1,0 +1,15 @@
+# Configuración Nixpacks para Railway
+# Fuerza a Railway a usar PHP
+
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer"]
+
+[phases.install]
+cmds = ["echo 'No build step needed for PHP'"]
+
+[phases.build]
+cmds = ["echo 'PHP application ready'"]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t . index.php"
+
