@@ -1,0 +1,83 @@
+// Estilos comunes compartidos entre componentes
+
+// Brand/Logo styles
+.brand-link {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s, color 0.2s;
+  
+  &:hover {
+    color: #ffc107;
+    transform: scale(1.05);
+    text-decoration: none;
+  }
+}
+
+.brand-icon {
+  font-size: 2rem;
+  animation: bounce 2s infinite;
+}
+
+.brand-name {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+// Page Header
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0 0 15px 15px;
+}
+
+// Match Cards
+.match-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #e9ecef;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.match-teams {
+  padding: 1rem 0;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.team-name {
+  font-size: 1.1rem;
+}
+
+.score {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+.vs-text {
+  color: #6c757d;
+  font-size: 1.2rem;
+}
+
+
+
+
+
+

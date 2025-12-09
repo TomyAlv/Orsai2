@@ -1,0 +1,282 @@
+/* Estilos globales para Orsai */
+
+:root {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #0dcaf0;
+  --dark-color: #212529;
+  --light-color: #f8f9fa;
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Modo Oscuro */
+body.dark-theme {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+body.dark-theme .card {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+body.dark-theme .card-header {
+  background-color: #2d2d2d;
+  border-bottom-color: #333;
+}
+
+body.dark-theme .form-control {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .form-control:focus {
+  background-color: #2d2d2d;
+  border-color: #667eea;
+  color: #e0e0e0;
+}
+
+body.dark-theme .form-select {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .btn-outline-light {
+  border-color: #666;
+  color: #e0e0e0;
+}
+
+body.dark-theme .btn-outline-light:hover {
+  background-color: #444;
+  border-color: #666;
+}
+
+body.dark-theme .text-muted {
+  color: #aaa !important;
+}
+
+body.dark-theme .section-subtitle,
+body.dark-theme p.text-muted {
+  color: #aaa !important;
+}
+
+body.dark-theme .spinner-border.text-primary {
+  color: #667eea !important;
+}
+
+body.dark-theme .text-white {
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .bg-light {
+  background-color: #2d2d2d !important;
+}
+
+body.dark-theme .border {
+  border-color: #444 !important;
+}
+
+body.dark-theme .alert {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .table {
+  color: #e0e0e0;
+}
+
+body.dark-theme .table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: #1e1e1e;
+}
+
+body.dark-theme .table-hover > tbody > tr:hover > td {
+  background-color: #2d2d2d;
+}
+
+/* Modo Oscuro - Contenedores y cards adicionales */
+body.dark-theme .container {
+  background-color: transparent;
+}
+
+body.dark-theme .card-body {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-theme .card-header {
+  background-color: #1e1e1e;
+  border-bottom-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .form-label {
+  color: #e0e0e0;
+}
+
+body.dark-theme .form-control:disabled {
+  background-color: #1e1e1e;
+  color: #aaa;
+  border-color: #444;
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6 {
+  color: #e0e0e0;
+}
+
+body.dark-theme .text-primary {
+  color: #8b9aff !important;
+}
+
+body.dark-theme .badge {
+  color: #fff;
+}
+
+body.dark-theme .form-select {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .form-select:focus {
+  background-color: #2d2d2d;
+  border-color: #667eea;
+  color: #e0e0e0;
+}
+
+body.dark-theme .nav-tabs {
+  border-bottom-color: #444;
+}
+
+body.dark-theme .nav-tabs .nav-link {
+  color: #aaa;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+body.dark-theme .nav-tabs .nav-link:hover {
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+body.dark-theme .nav-tabs .nav-link.active {
+  color: #e0e0e0;
+  background-color: transparent;
+  border-color: #444 #444 transparent;
+}
+
+body.dark-theme .table thead {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-theme .table td,
+body.dark-theme .table th {
+  border-color: #444;
+}
+
+body.dark-theme .table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #1e1e1e;
+}
+
+body.dark-theme .table-striped > tbody > tr:nth-of-type(even) {
+  background-color: #2d2d2d;
+}
+
+body.dark-theme .table-hover > tbody > tr:hover {
+  background-color: #3d3d3d;
+}
+
+/* Modo Oscuro - Headers y secciones con gradientes */
+body.dark-theme .page-header,
+body.dark-theme .bg-primary {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%) !important;
+}
+
+body.dark-theme .bg-dark {
+  background-color: #1a202c !important;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+body.dark-theme .card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-theme .card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.alert {
+  border-radius: 10px;
+  border: none;
+}
+
