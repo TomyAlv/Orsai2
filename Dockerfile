@@ -20,15 +20,26 @@ RUN docker-php-ext-install pdo pdo_sqlite
 # Crear directorio para la aplicación
 WORKDIR /app
 
-# Copiar archivos de la API
-COPY api/ .
+# Copiar todo el repositorio primero (necesario para submódulos)
+COPY . .
 
-# Copiar frontend y compilarlo
-COPY frontend/ ./frontend/
-RUN cd frontend && \
-    npm install && \
-    npm run build -- --configuration=development && \
-    cd ..
+# Inicializar submódulos si existen
+RUN if [ -f .gitmodules ]; then \
+        git submodule update --init --recursive || true; \
+    fi
+
+# Copiar archivos de la API al directorio de trabajo
+RUN cp -r api/* . || true
+
+# Compilar el frontend
+RUN if [ -d frontend ] && [ -f frontend/package.json ]; then \
+        cd frontend && \
+        npm install && \
+        npm run build -- --configuration=development && \
+        cd ..; \
+    else \
+        echo "Frontend no encontrado o no es un directorio válido"; \
+    fi
 
 # Crear directorio para base de datos con permisos
 RUN mkdir -p /app/db && chmod 777 /app/db
