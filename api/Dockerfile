@@ -18,11 +18,13 @@ COPY . .
 # Crear directorio para base de datos con permisos
 RUN mkdir -p /app/db && chmod 777 /app/db
 
+# Copiar y hacer ejecutable el script de inicio
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Exponer puerto (Railway lo asigna automáticamente)
 EXPOSE 8080
 
-# Comando de inicio
-# -t . establece el directorio raíz como el directorio actual (WORKDIR /app)
-# index.php actúa como router para todas las peticiones
-CMD php -S 0.0.0.0:${PORT:-8080} -t . index.php
+# Comando de inicio usando el script
+CMD ["/app/start.sh"]
 
