@@ -1,0 +1,50 @@
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Build outputs
+dist/
+frontend/dist/
+*.js.map
+
+# Base de datos (NO subir datos reales)
+db/*.sqlite
+db/*.db
+db/*.sqlite-journal
+
+# Archivos de entorno (NO subir API keys)
+.env
+.env.local
+.env.*.local
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.log
+*.cache
+*.swp
+*.swo
+*~
+
+# Configuración de editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos comprimidos
+*.zip
+*.rar
+*.7z
+
+# Archivos de backup
+*.bak
+*.backup
+
+# Uploads (si son muchos)
+uploads/profile_pictures/*.jpg
+uploads/profile_pictures/*.png
