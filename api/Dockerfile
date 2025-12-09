@@ -12,8 +12,8 @@ RUN docker-php-ext-install pdo pdo_sqlite
 # Crear directorio para la aplicación
 WORKDIR /app
 
-# Copiar archivos de la aplicación
-COPY . /app
+# Copiar archivos de la aplicación (desde el contexto actual al WORKDIR)
+COPY . .
 
 # Crear directorio para base de datos con permisos
 RUN mkdir -p /app/db && chmod 777 /app/db
