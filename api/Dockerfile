@@ -22,5 +22,7 @@ RUN mkdir -p /app/db && chmod 777 /app/db
 EXPOSE 8080
 
 # Comando de inicio
+# -t . establece el directorio raíz como el directorio actual (WORKDIR /app)
+# index.php actúa como router para todas las peticiones
 CMD php -S 0.0.0.0:${PORT:-8080} -t . index.php
 

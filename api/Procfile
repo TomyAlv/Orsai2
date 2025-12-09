@@ -1,4 +1,2 @@
 web: php -S 0.0.0.0:$PORT -t . index.php
-# Alternativa si la anterior no funciona:
-# web: cd /app/api && php -S 0.0.0.0:$PORT index.php
 
