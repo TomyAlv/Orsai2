@@ -23,8 +23,33 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 // Si no hay action y es una petición GET, intentar servir el frontend
 if ($action === null && $method === 'GET') {
-    // Ruta al frontend compilado
-    $frontendPath = __DIR__ . '/../frontend/dist/frontend/browser';
+    // Ruta al frontend compilado (probar diferentes rutas posibles)
+    $possiblePaths = [
+        __DIR__ . '/../frontend/dist/frontend/browser',
+        __DIR__ . '/../frontend/dist/browser',
+        __DIR__ . '/frontend/dist/frontend/browser',
+        __DIR__ . '/../dist/frontend/browser'
+    ];
+    
+    $frontendPath = null;
+    foreach ($possiblePaths as $path) {
+        if (file_exists($path . '/index.html')) {
+            $frontendPath = $path;
+            break;
+        }
+    }
+    
+    if ($frontendPath === null) {
+        // Si no se encuentra el frontend, mostrar mensaje de error útil
+        http_response_code(503);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'error' => 'Frontend no encontrado',
+            'message' => 'El frontend no ha sido compilado. Ejecuta: cd frontend && npm run build',
+            'searched_paths' => $possiblePaths
+        ]);
+        exit;
+    }
     $requestUri = $_SERVER['REQUEST_URI'];
     
     // Remover query string
