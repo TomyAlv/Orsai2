@@ -18,6 +18,10 @@ WORKDIR /app
 # Copiar archivos de la API
 COPY api/ .
 
+# Copiar frontend compilado (si existe)
+# Nota: El frontend debe compilarse antes de construir la imagen Docker
+COPY frontend/dist/frontend/browser /app/frontend/dist/frontend/browser
+
 # Crear directorio para base de datos con permisos
 RUN mkdir -p /app/db && chmod 777 /app/db
 

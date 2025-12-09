@@ -317,18 +317,29 @@ export const environment = {
 
 **⚠️ IMPORTANTE**: Render requiere un `Dockerfile` en la raíz del repositorio o usar `render.yaml` para configuración.
 
-1. Ve a https://render.com
-2. "New" → "Web Service"
-3. Conecta tu repositorio de GitHub
-4. Selecciona tu repositorio `orsai`
-5. **Configuración**:
+**📝 NOTA**: El backend ahora sirve tanto la API como el frontend compilado. Asegúrate de compilar el frontend antes de desplegar.
+
+1. **Compilar el frontend primero**:
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   ```
+
+2. Ve a https://render.com
+3. "New" → "Web Service"
+4. Conecta tu repositorio de GitHub
+5. Selecciona tu repositorio `orsai`
+6. **Configuración**:
    - **Name**: `orsai-backend`
-   - **Environment**: PHP
+   - **Environment**: **Docker** (no PHP)
    - **Region**: Elige el más cercano
    - **Branch**: `main` (o la rama que uses)
-   - **Root Directory**: `api`
-   - **Build Command**: (dejar vacío)
-   - **Start Command**: `php -S 0.0.0.0:$PORT -t . index.php`
+   - **Root Directory**: (dejar vacío, usar raíz)
+   - **Dockerfile Path**: `Dockerfile`
+   - **Docker Context**: `.`
+   - **Build Command**: (dejar vacío, el Dockerfile lo maneja)
+   - **Start Command**: (dejar vacío, el Dockerfile lo define)
    - **Plan**: Free (o el que prefieras)
 
 6. **Variables de Entorno** (Environment Variables):

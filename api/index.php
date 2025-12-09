@@ -8,7 +8,6 @@ require_once __DIR__ . '/jwt.php';
 /**
  * Configuración CORS para permitir peticiones desde el frontend Angular
  */
-header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -18,10 +17,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$action = $_GET['action'] ?? 'ping';
+$action = $_GET['action'] ?? null;
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
+// Si no hay action y es una petición GET, intentar servir el frontend
+if ($action === null && $method === 'GET') {
+    // Ruta al frontend compilado
+    $frontendPath = __DIR__ . '/../frontend/dist/frontend/browser';
+    $requestUri = $_SERVER['REQUEST_URI'];
+    
+    // Remover query string
+    $path = parse_url($requestUri, PHP_URL_PATH);
+    
+    // Si es la raíz o no tiene extensión, servir index.html
+    if ($path === '/' || $path === '' || !pathinfo($path, PATHINFO_EXTENSION)) {
+        $indexFile = $frontendPath . '/index.html';
+        if (file_exists($indexFile)) {
+            header('Content-Type: text/html; charset=utf-8');
+            readfile($indexFile);
+            exit;
+        }
+    }
+    
+    // Intentar servir archivo estático del frontend
+    $filePath = $frontendPath . $path;
+    if (file_exists($filePath) && is_file($filePath)) {
+        $mimeType = mime_content_type($filePath);
+        if ($mimeType === false) {
+            // Si no se puede detectar, intentar por extensión
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            $mimeTypes = [
+                'js' => 'application/javascript',
+                'css' => 'text/css',
+                'html' => 'text/html',
+                'json' => 'application/json',
+                'png' => 'image/png',
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'gif' => 'image/gif',
+                'svg' => 'image/svg+xml',
+                'ico' => 'image/x-icon'
+            ];
+            $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
+        }
+        header('Content-Type: ' . $mimeType);
+        readfile($filePath);
+        exit;
+    }
+    
+    // Si no se encuentra el archivo, servir index.html (para rutas de Angular)
+    $indexFile = $frontendPath . '/index.html';
+    if (file_exists($indexFile)) {
+        header('Content-Type: text/html; charset=utf-8');
+        readfile($indexFile);
+        exit;
+    }
+}
+
+// Si hay action, procesar como API
+// Establecer Content-Type JSON solo para respuestas de API
+header('Content-Type: application/json');
+$action = $action ?? 'ping';
 
 try {
 switch ($action) {
