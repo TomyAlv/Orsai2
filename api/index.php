@@ -33,7 +33,8 @@ if ($action === null && $method === 'GET') {
     
     $frontendPath = null;
     foreach ($possiblePaths as $path) {
-        if (file_exists($path . '/index.html')) {
+        // Buscar index.html o index.csr.html
+        if (file_exists($path . '/index.html') || file_exists($path . '/index.csr.html')) {
             $frontendPath = $path;
             break;
         }
@@ -55,10 +56,17 @@ if ($action === null && $method === 'GET') {
     // Remover query string
     $path = parse_url($requestUri, PHP_URL_PATH);
     
-    // Si es la raíz o no tiene extensión, servir index.html
+    // Si es la raíz o no tiene extensión, servir index.html o index.csr.html
     if ($path === '/' || $path === '' || !pathinfo($path, PATHINFO_EXTENSION)) {
-        $indexFile = $frontendPath . '/index.html';
-        if (file_exists($indexFile)) {
+        // Intentar index.html primero, luego index.csr.html
+        $indexFile = null;
+        if (file_exists($frontendPath . '/index.html')) {
+            $indexFile = $frontendPath . '/index.html';
+        } elseif (file_exists($frontendPath . '/index.csr.html')) {
+            $indexFile = $frontendPath . '/index.csr.html';
+        }
+        
+        if ($indexFile !== null) {
             header('Content-Type: text/html; charset=utf-8');
             readfile($indexFile);
             exit;
@@ -91,9 +99,15 @@ if ($action === null && $method === 'GET') {
         exit;
     }
     
-    // Si no se encuentra el archivo, servir index.html (para rutas de Angular)
-    $indexFile = $frontendPath . '/index.html';
-    if (file_exists($indexFile)) {
+    // Si no se encuentra el archivo, servir index.html o index.csr.html (para rutas de Angular)
+    $indexFile = null;
+    if (file_exists($frontendPath . '/index.html')) {
+        $indexFile = $frontendPath . '/index.html';
+    } elseif (file_exists($frontendPath . '/index.csr.html')) {
+        $indexFile = $frontendPath . '/index.csr.html';
+    }
+    
+    if ($indexFile !== null) {
         header('Content-Type: text/html; charset=utf-8');
         readfile($indexFile);
         exit;
