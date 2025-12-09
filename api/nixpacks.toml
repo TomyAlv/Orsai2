@@ -2,7 +2,11 @@
 # Fuerza a Railway a usar PHP
 
 [phases.setup]
-nixPkgs = ["php82", "php82Packages.composer"]
+nixPkgs = [
+    "php82",
+    "php82Packages.composer",
+    "sqlite"
+]
 
 [phases.install]
 cmds = ["echo 'No build step needed for PHP'"]

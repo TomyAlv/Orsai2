@@ -1,7 +1,12 @@
 # Dockerfile para Railway - Fuerza uso de PHP
 FROM php:8.2-cli
 
-# Instalar extensiones necesarias
+# Instalar dependencias del sistema necesarias para SQLite
+RUN apt-get update && apt-get install -y \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar extensiones necesarias de PHP
 RUN docker-php-ext-install pdo pdo_sqlite
 
 # Crear directorio para la aplicación
