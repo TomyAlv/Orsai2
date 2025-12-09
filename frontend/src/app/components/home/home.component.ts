@@ -870,12 +870,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   checkAdminStatus() {
-    console.log('Verificando estado de admin...');
     this.api.isAdmin().subscribe({
       next: (response) => {
-        console.log('Respuesta de isAdmin:', response);
         this.isAdmin = response.isAdmin;
-        console.log('isAdmin establecido a:', this.isAdmin);
         this.cdr.detectChanges();
       },
       error: (error) => {

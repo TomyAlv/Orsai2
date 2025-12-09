@@ -459,22 +459,17 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     if (!this.authService.isAuthenticated()) {
-      console.log('Usuario no autenticado, redirigiendo a login');
       this.router.navigate(['/login']);
       return;
     }
-    console.log('Usuario autenticado, cargando perfil');
     this.checkAdminStatus();
     this.loadProfile();
   }
 
   checkAdminStatus() {
-    console.log('Verificando estado de admin (profile)...');
     this.api.isAdmin().subscribe({
       next: (response) => {
-        console.log('Respuesta de isAdmin (profile):', response);
         this.isAdmin = response.isAdmin;
-        console.log('isAdmin establecido a (profile):', this.isAdmin);
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -493,20 +488,14 @@ export class ProfileComponent implements OnInit {
     this.errorMessage = '';
     this.profile = null; // Resetear perfil
     
-    console.log('Cargando perfil...');
-    
     this.api.getProfile().subscribe({
       next: (response) => {
-        console.log('Respuesta del perfil:', response);
         if (response && response.profile) {
           // Establecer ambos valores juntos
           this.profile = response.profile;
           // Guardar una copia del perfil original para detectar cambios
           this.originalProfile = JSON.parse(JSON.stringify(response.profile));
           this.loading = false;
-          console.log('Perfil cargado:', this.profile);
-          console.log('Loading establecido a false');
-          console.log('Valores actuales - loading:', this.loading, 'profile:', this.profile);
           // Forzar detección de cambios
           this.cdr.detectChanges();
         } else {
@@ -518,7 +507,6 @@ export class ProfileComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar perfil:', error);
-        console.error('Error completo:', JSON.stringify(error, null, 2));
         this.errorMessage = error.error?.error || error.message || 'Error al cargar el perfil';
         this.loading = false;
         this.cdr.detectChanges();

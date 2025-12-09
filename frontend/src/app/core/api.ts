@@ -154,7 +154,6 @@ export class ApiService {
 
   getProfile(): Observable<{ status: string; profile: UserProfile }> {
     const headers = this.getHeaders();
-    console.log('Headers enviados:', headers.keys());
     return this.http.get<{ status: string; profile: UserProfile }>(
       `${this.baseUrl}/index.php?action=profile`,
       { headers }

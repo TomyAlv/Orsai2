@@ -344,12 +344,9 @@ export class MatchesComponent implements OnInit {
   }
 
   checkAdminStatus() {
-    console.log('Verificando estado de admin (matches)...');
     this.api.isAdmin().subscribe({
       next: (response) => {
-        console.log('Respuesta de isAdmin (matches):', response);
         this.isAdmin = response.isAdmin;
-        console.log('isAdmin establecido a (matches):', this.isAdmin);
       },
       error: (error) => {
         console.error('Error al verificar admin (matches):', error);
@@ -460,7 +457,6 @@ export class MatchesComponent implements OnInit {
     this.showingHistory = true; // Mostrando partidos históricos
     this.api.getMatchesHistory().subscribe({
       next: (response) => {
-        console.log('Partidos históricos recibidos:', response);
         this.matches = response.matches || [];
         this.loading = false;
         this.showingHistory = true;

@@ -578,12 +578,9 @@ export class MatchDetailComponent implements OnInit {
   }
 
   checkAdminStatus() {
-    console.log('Verificando estado de admin (match-detail)...');
     this.api.isAdmin().subscribe({
       next: (response) => {
-        console.log('Respuesta de isAdmin (match-detail):', response);
         this.isAdmin = response.isAdmin;
-        console.log('isAdmin establecido a (match-detail):', this.isAdmin);
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -613,21 +610,16 @@ export class MatchDetailComponent implements OnInit {
     this.match = null;
     this.comments = [];
     
-    console.log('Cargando partido y comentarios para ID:', this.matchId);
-    
     // Cargar partido y comentarios en paralelo
     forkJoin({
       match: this.api.getMatch(this.matchId),
       comments: this.api.getComments(this.matchId)
     }).subscribe({
       next: (results) => {
-        console.log('Respuesta forkJoin:', results);
-        
         // Procesar partido
         if (results.match?.match) {
           this.match = results.match.match;
           this.loading = false;
-          console.log('Partido cargado:', this.match);
         } else {
           console.error('No se encontró el partido en la respuesta:', results.match);
           this.errorMessage = 'No se pudo cargar la información del partido';
@@ -637,7 +629,6 @@ export class MatchDetailComponent implements OnInit {
         // Procesar comentarios
         this.comments = results.comments?.comments || [];
         this.loadingComments = false;
-        console.log('Comentarios cargados:', this.comments.length);
         
         // Cargar votos para cada comentario
         this.comments.forEach(comment => {
@@ -649,7 +640,6 @@ export class MatchDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar partido/comentarios:', error);
-        console.error('Error completo:', JSON.stringify(error, null, 2));
         
         // Si falla el partido, mostrar error
         if (!this.match) {
@@ -850,7 +840,6 @@ export class MatchDetailComponent implements OnInit {
     }
 
     if (this.votingComments.has(commentId)) {
-      console.log('Ya se está votando este comentario');
       return; // Ya se está votando
     }
 
@@ -862,14 +851,12 @@ export class MatchDetailComponent implements OnInit {
 
     // Verificar si es el propio comentario
     if (this.isOwnComment(comment)) {
-      console.log('No se puede votar el propio comentario');
       this.commentError = 'No puedes votar tu propio comentario';
       return;
     }
 
     this.votingComments.add(commentId);
     const previousVote = comment?.user_vote;
-    console.log('Enviando voto al servidor...');
 
     this.api.voteComment(commentId, voteType).subscribe({
       next: (response) => {
@@ -906,17 +893,13 @@ export class MatchDetailComponent implements OnInit {
    */
   isOwnComment(comment: Comment): boolean {
     if (!this.isAuthenticated) {
-      console.log('isOwnComment: No autenticado');
       return false;
     }
     const user = this.authService.getUser();
     if (!user || !user.id) {
-      console.log('isOwnComment: No hay usuario o ID');
       return false;
     }
-    const isOwn = comment.user_id === user.id;
-    console.log('isOwnComment:', { commentUserId: comment.user_id, currentUserId: user.id, isOwn });
-    return isOwn;
+    return comment.user_id === user.id;
   }
 
   /**

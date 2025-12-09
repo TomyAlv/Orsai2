@@ -8,6 +8,7 @@ require_once __DIR__ . '/jwt.php';
 /**
  * Configuración CORS para permitir peticiones desde el frontend Angular
  */
+header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -17,107 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$action = $_GET['action'] ?? null;
+$action = $_GET['action'] ?? 'ping';
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
-// Si no hay action y es una petición GET, intentar servir el frontend
-if ($action === null && $method === 'GET') {
-    // Ruta al frontend compilado (probar diferentes rutas posibles)
-    $possiblePaths = [
-        __DIR__ . '/../frontend/dist/frontend/browser',
-        __DIR__ . '/../frontend/dist/browser',
-        __DIR__ . '/frontend/dist/frontend/browser',
-        __DIR__ . '/../dist/frontend/browser'
-    ];
-    
-    $frontendPath = null;
-    foreach ($possiblePaths as $path) {
-        // Buscar index.html o index.csr.html
-        if (file_exists($path . '/index.html') || file_exists($path . '/index.csr.html')) {
-            $frontendPath = $path;
-            break;
-        }
-    }
-    
-    if ($frontendPath === null) {
-        // Si no se encuentra el frontend, mostrar mensaje de error útil
-        http_response_code(503);
-        header('Content-Type: application/json');
-        echo json_encode([
-            'error' => 'Frontend no encontrado',
-            'message' => 'El frontend no ha sido compilado. Ejecuta: cd frontend && npm run build',
-            'searched_paths' => $possiblePaths
-        ]);
-        exit;
-    }
-    $requestUri = $_SERVER['REQUEST_URI'];
-    
-    // Remover query string
-    $path = parse_url($requestUri, PHP_URL_PATH);
-    
-    // Si es la raíz o no tiene extensión, servir index.html o index.csr.html
-    if ($path === '/' || $path === '' || !pathinfo($path, PATHINFO_EXTENSION)) {
-        // Intentar index.html primero, luego index.csr.html
-        $indexFile = null;
-        if (file_exists($frontendPath . '/index.html')) {
-            $indexFile = $frontendPath . '/index.html';
-        } elseif (file_exists($frontendPath . '/index.csr.html')) {
-            $indexFile = $frontendPath . '/index.csr.html';
-        }
-        
-        if ($indexFile !== null) {
-            header('Content-Type: text/html; charset=utf-8');
-            readfile($indexFile);
-            exit;
-        }
-    }
-    
-    // Intentar servir archivo estático del frontend
-    $filePath = $frontendPath . $path;
-    if (file_exists($filePath) && is_file($filePath)) {
-        $mimeType = mime_content_type($filePath);
-        if ($mimeType === false) {
-            // Si no se puede detectar, intentar por extensión
-            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-            $mimeTypes = [
-                'js' => 'application/javascript',
-                'css' => 'text/css',
-                'html' => 'text/html',
-                'json' => 'application/json',
-                'png' => 'image/png',
-                'jpg' => 'image/jpeg',
-                'jpeg' => 'image/jpeg',
-                'gif' => 'image/gif',
-                'svg' => 'image/svg+xml',
-                'ico' => 'image/x-icon'
-            ];
-            $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
-        }
-        header('Content-Type: ' . $mimeType);
-        readfile($filePath);
-        exit;
-    }
-    
-    // Si no se encuentra el archivo, servir index.html o index.csr.html (para rutas de Angular)
-    $indexFile = null;
-    if (file_exists($frontendPath . '/index.html')) {
-        $indexFile = $frontendPath . '/index.html';
-    } elseif (file_exists($frontendPath . '/index.csr.html')) {
-        $indexFile = $frontendPath . '/index.csr.html';
-    }
-    
-    if ($indexFile !== null) {
-        header('Content-Type: text/html; charset=utf-8');
-        readfile($indexFile);
-        exit;
-    }
-}
-
-// Si hay action, procesar como API
-// Establecer Content-Type JSON solo para respuestas de API
-header('Content-Type: application/json');
-$action = $action ?? 'ping';
 
 try {
 switch ($action) {
