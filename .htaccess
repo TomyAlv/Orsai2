@@ -6,9 +6,14 @@ RewriteEngine On
 
 # IMPORTANTE: Las reglas de API deben estar ANTES de las reglas de Angular
 
+# Permitir acceso directo a archivos PHP en /api/
+RewriteCond %{REQUEST_URI} ^/api/.*\.php$
+RewriteRule ^api/(.*\.php)$ api/$1 [L]
+
 # Permitir acceso a la API - procesar ANTES de Angular routing
 RewriteCond %{REQUEST_URI} ^/api/
-RewriteRule ^api/(.*)$ api/index.php?%{QUERY_STRING} [QSA,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/(.*)$ api/index.php?action=$1 [QSA,L]
 
 # Si el archivo o directorio existe, servirlo directamente
 RewriteCond %{REQUEST_FILENAME} !-f
