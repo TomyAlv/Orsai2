@@ -43,28 +43,15 @@ La plataforma está diseñada para ser fácil de instalar y configurar, utilizan
   - Equipos locales y visitantes
   - Resultados y marcadores
   - Estado del partido (programado, en vivo, finalizado)
-  - Fecha y hora del encuentro (en horario de Argentina GMT-3)
+  - Fecha y hora del encuentro
   - Competición/liga
 - **Detalle de Partidos**: Página dedicada para cada partido con:
   - Información completa del encuentro
   - Sección de comentarios
   - Sistema de votación en comentarios
   - Integración con noticias relacionadas
-- **Sincronización de Partidos**: 
-  - **Partidos Actuales y Futuros**: Sincroniza partidos del día actual y los próximos 14 días
-  - **Partidos Históricos**: Botón separado para ver partidos de los últimos 7 días hacia atrás
-  - **Filtros Inteligentes**: Solo muestra partidos de:
-    - Las 5 ligas principales de Europa (Premier League, La Liga, Serie A, Bundesliga, Ligue 1)
-    - Liga Profesional Argentina
-    - Champions League (UEFA, masculina)
-    - Europa League (UEFA, masculina)
-    - Copa Libertadores
-  - **Exclusión Automática**: Filtra automáticamente variantes no deseadas como:
-    - Champions League de mujeres
-    - Champions League de África/Asia (AFC/CAF)
-    - Ligas juveniles y de reserva
+- **Sincronización de Partidos**: Sistema para cargar partidos desde fuentes externas o datos de ejemplo.
 - **Partidos en Vivo**: Visualización destacada de partidos que se están jugando en tiempo real.
-- **Timezone**: Todas las fechas y horas se muestran en horario de Argentina (GMT-3).
 
 ### 3. Sistema de Comentarios
 
@@ -128,12 +115,6 @@ La plataforma está diseñada para ser fácil de instalar y configurar, utilizan
     - Partido relacionado
     - Fecha de creación
     - Votos positivos y negativos
-- **Herramientas de Administración**:
-  - **Generación de Comentarios Ficticios**: Botón para generar comentarios contextualizados automáticamente
-    - Crea usuarios ficticios con perfiles diversos (nacionalidades, equipos favoritos)
-    - Genera comentarios realistas basados en resultados de partidos
-    - Considera preferencias de equipos de los usuarios ficticios
-    - Variedad de tipos de comentarios (positivos, negativos, analíticos, emocionales)
 - **Navegación**: Botón de acceso al panel de administración visible en todas las páginas para usuarios administradores
 
 ### 7. Sistema de Temas (Modo Oscuro/Claro)
@@ -214,7 +195,7 @@ La plataforma está diseñada para ser fácil de instalar y configurar, utilizan
 ```
 orsai/
 ├── api/                          # Backend PHP
-│   ├── config.php               # Configuración general (timezone, API keys, filtros de ligas)
+│   ├── config.php               # Configuración general
 │   ├── db.php                   # Conexión a base de datos SQLite
 │   ├── jwt.php                  # Funciones para JWT (generación y validación)
 │   ├── index.php                # Endpoints principales de la API REST
@@ -222,7 +203,6 @@ orsai/
 │   ├── upload_profile_picture.php  # Manejo de subida de imágenes de perfil
 │   ├── set_admin.php            # Utilidad para asignar rol de administrador
 │   ├── check_user_role.php      # Utilidad para verificar rol de usuario
-│   ├── generate_fake_comments.php  # Script para generar comentarios ficticios contextualizados
 │   ├── add_karma_system.php     # Script de migración para sistema de karma
 │   ├── add_indexes.php          # Script para agregar índices a la BD
 │   └── update_users_table.php   # Script de migración para actualizar tabla usuarios
@@ -289,11 +269,6 @@ orsai/
 4. Abrir el navegador y navegar a: `http://localhost/orsai/api/init_db.php`
 5. Verificar que aparezca el mensaje: "OK - Tablas creadas"
 6. Esto creará el archivo `db/orsai.sqlite` con todas las tablas necesarias
-7. **Configuración de Timezone**: El sistema está configurado para usar el timezone de Argentina (GMT-3) automáticamente
-8. **Configuración de API-Football**: 
-   - Editar `api/config.php` y configurar tu API key de API-Football si deseas sincronizar partidos reales
-   - La API key actual es de ejemplo y puede tener límites de uso
-   - El sistema filtra automáticamente solo las ligas principales y copas internacionales
 
 ### Paso 2: Configurar el Frontend
 
@@ -377,10 +352,9 @@ Para asignar rol de administrador a un usuario existente:
    - Escribir un comentario en el campo de texto
    - Hacer clic en "Comentar"
 3. Para votar en comentarios de otros usuarios:
-   - Hacer clic en el botón de voto positivo (↑) o negativo (↓) a la derecha del comentario
+   - Hacer clic en el botón de voto positivo (↑) o negativo (↓)
    - Solo se puede votar en comentarios ajenos
-   - El contador muestra el score del comentario (diferencia entre votos positivos y negativos)
-   - Los votos se muestran a la derecha del comentario
+   - El contador muestra el score del comentario
 
 #### Cambio de Tema
 
@@ -418,14 +392,6 @@ Para asignar rol de administrador a un usuario existente:
    - Hacer clic en el botón "Eliminar" junto al comentario
    - Confirmar la eliminación
 
-#### Herramientas de Administración
-
-1. **Generar Comentarios Ficticios**:
-   - En el panel de administración, sección "Herramientas de Administración"
-   - Hacer clic en "Generar Comentarios Ficticios"
-   - El sistema creará usuarios ficticios y comentarios contextualizados basados en los partidos existentes
-   - Los comentarios consideran resultados de partidos y preferencias de equipos de los usuarios ficticios
-
 ---
 
 ## Seguridad
@@ -459,11 +425,9 @@ Para asignar rol de administrador a un usuario existente:
 - `POST /api/index.php?action=login` - Iniciar sesión
 
 ### Partidos
-- `GET /api/index.php?action=matches` - Obtener lista de partidos actuales y futuros (hoy en adelante)
-- `GET /api/index.php?action=matches-history` - Obtener lista de partidos históricos (últimos 7 días)
+- `GET /api/index.php?action=matches` - Obtener lista de partidos
 - `GET /api/index.php?action=match&id=X` - Obtener partido específico
-- `POST /api/index.php?action=sync-matches` - Sincronizar partidos actuales y futuros (hoy + próximos 14 días)
-- `POST /api/index.php?action=sync-matches-history` - Sincronizar partidos históricos (últimos 7 días)
+- `POST /api/index.php?action=sync-matches` - Sincronizar partidos
 
 ### Comentarios
 - `GET /api/index.php?action=comments&match_id=X` - Obtener comentarios de un partido
@@ -489,7 +453,6 @@ Para asignar rol de administrador a un usuario existente:
 - `GET /api/index.php?action=admin-comments` - Listar comentarios (requiere admin)
 - `DELETE /api/index.php?action=admin-comments&comment_id=X` - Eliminar comentario (requiere admin)
 - `GET /api/index.php?action=check-admin` - Verificar si el usuario es admin
-- `POST /api/index.php?action=generate-fake-comments` - Generar comentarios ficticios contextualizados (requiere admin)
 
 ### Utilidades
 - `GET /api/index.php?action=ping` - Verificar estado de la API
