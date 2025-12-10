@@ -462,8 +462,15 @@ export class ProfileComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    this.checkAdminStatus();
-    this.loadProfile();
+    // Forzar refresco de sesión para asegurar token válido
+    this.authService.refreshSession().then((ok) => {
+      if (!ok) {
+        this.router.navigate(['/login']);
+        return;
+      }
+      this.checkAdminStatus();
+      this.loadProfile();
+    });
   }
 
   checkAdminStatus() {

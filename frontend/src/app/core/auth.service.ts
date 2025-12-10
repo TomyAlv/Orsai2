@@ -46,6 +46,34 @@ export class AuthService {
     return userStr ? JSON.parse(userStr) : null;
   }
 
+  /**
+   * Fuerza la recarga de token/usuario desde localStorage y valida contra el backend.
+   */
+  refreshSession(): Promise<boolean> {
+    const storage = this.getLocalStorage();
+    if (!storage) return Promise.resolve(false);
+    const token = storage.getItem('token');
+    if (!token) return Promise.resolve(false);
+
+    return new Promise((resolve) => {
+      this.api.getProfile().subscribe({
+        next: (response: any) => {
+          if (response?.profile) {
+            storage.setItem('user', JSON.stringify({ id: response.profile.id, username: response.profile.username }));
+            resolve(true);
+          } else {
+            this.logout();
+            resolve(false);
+          }
+        },
+        error: () => {
+          this.logout();
+          resolve(false);
+        }
+      });
+    });
+  }
+
   login(username: string, password: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.api.login(username, password).subscribe({
