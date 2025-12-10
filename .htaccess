@@ -4,6 +4,10 @@
 # Habilitar rewrite engine
 RewriteEngine On
 
+# Preservar encabezado Authorization (necesario para JWT en Ferozo)
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
 # Forzar que PHP se ejecute en todo el sitio (incluida /api/)
 AddHandler application/x-httpd-php .php
 AddType application/x-httpd-php .php
