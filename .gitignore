@@ -86,3 +86,6 @@ api/info.php
 
 # Directorio de deployment (generado por scripts)
 deploy_public_html/
+
+# NO ignorar public_html (necesario para Git deploy)
+# public_html/
