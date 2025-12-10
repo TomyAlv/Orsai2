@@ -128,6 +128,29 @@ Después de aplicar las soluciones:
 4. ✅ `https://orsai.online/api/index.php?action=matches` → Responde (puede estar vacío)
 5. ✅ `https://orsai.online` → Muestra noticias y partidos
 
+## ⚠️ Problemas Adicionales Identificados
+
+### Estructura del Servidor
+
+Según las capturas del servidor, hay problemas de estructura:
+
+1. **Carpeta `public_html/public_html/` anidada** - Estructura incorrecta
+2. **Archivos innecesarios en producción**:
+   - `frontend/` (código fuente, no necesario)
+   - `.git/` (repositorio Git, no necesario)
+   - Archivos `.md` (documentación, no necesaria)
+   - Scripts `.ps1` y `.sh` (scripts de desarrollo)
+
+### Solución para Estructura
+
+1. **Lee**: `GUIA_LIMPIEZA_PRODUCCION.md` para instrucciones detalladas
+2. **Usa**: `CHECKLIST_PRODUCCION_COMPLETO.md` para verificación paso a paso
+3. **Ejecuta**: `prepare_production_deploy.ps1` para preparar el deploy correcto
+
+### Nota sobre Ferozo
+
+Ferozo despliega desde la **raíz del repositorio**, NO desde una carpeta `public_html/` dentro del repo. Los archivos deben estar directamente en la raíz del repositorio.
+
 ## Contacto con Soporte
 
 Si después de seguir estos pasos el problema persiste, contacta al soporte de DonWeb/Ferozo con:

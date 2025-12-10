@@ -86,6 +86,10 @@ api/info.php
 
 # Directorio de deployment (generado por scripts)
 deploy_public_html/
+public_html/
 
-# NO ignorar public_html (necesario para Git deploy)
-# public_html/
+# Archivos de desarrollo que no deben estar en producción (pero sí en el repo)
+# Estos se excluyen manualmente del servidor
+# frontend/ (código fuente, no compilado)
+# *.ps1, *.sh (scripts de desarrollo)
+# *.md (documentación, excepto README.md)
