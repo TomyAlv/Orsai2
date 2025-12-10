@@ -82,6 +82,13 @@ switch ($action) {
                 throw new Exception('Método no permitido');
             }
             break;
+        case 'sync-live-matches':
+            if ($method === 'POST') {
+                handleSyncLiveMatches();
+            } else {
+                throw new Exception('Método no permitido');
+            }
+            break;
         case 'sync-matches-history':
             if ($method === 'POST') {
                 handleSyncMatchesHistory();
@@ -92,6 +99,13 @@ switch ($action) {
         case 'matches-history':
             if ($method === 'GET') {
                 handleGetMatchesHistory();
+            } else {
+                throw new Exception('Método no permitido');
+            }
+            break;
+        case 'live-matches':
+            if ($method === 'GET') {
+                handleGetLiveMatches();
             } else {
                 throw new Exception('Método no permitido');
             }
@@ -296,10 +310,11 @@ function handleLogin($input) {
 }
 
 /**
- * Obtiene partidos actuales (hoy y futuros)
- * No muestra partidos pasados - FILTRO ESTRICTO
+ * Obtiene partidos.
+ * mode=current (default): hoy y futuros.
+ * mode=live: solo en vivo (ventana ayer-hoy-mañana).
  */
-function handleGetMatches() {
+function handleGetMatches($mode = 'current') {
     try {
         require_once __DIR__ . '/config.php';
         $pdo = getConnection();
@@ -307,12 +322,23 @@ function handleGetMatches() {
         $allowedPatterns = defined('ALLOWED_LEAGUE_PATTERNS') ? ALLOWED_LEAGUE_PATTERNS : [];
         $excludedPatterns = defined('EXCLUDED_LEAGUE_PATTERNS') ? EXCLUDED_LEAGUE_PATTERNS : [];
         
-        // Desde hoy 00:00:00 en adelante - FILTRO ESTRICTO
-        $cutoffDate = date('Y-m-d 00:00:00');
-        
-        // Filtrar estrictamente: solo partidos de hoy en adelante
-        $whereParts = ["DATE(match_date) >= DATE(?)"];
-        $params = [$cutoffDate];
+        $whereParts = [];
+        $params = [];
+
+        if ($mode === 'live') {
+            // Ventana corta para evitar partidos viejos con status LIVE obsoleto
+            $startDate = date('Y-m-d 00:00:00', strtotime('-1 day'));
+            $endDate = date('Y-m-d 23:59:59', strtotime('+1 day'));
+            $whereParts[] = "status = 'LIVE'";
+            $whereParts[] = "match_date BETWEEN ? AND ?";
+            $params[] = $startDate;
+            $params[] = $endDate;
+        } else {
+            // Desde hoy 00:00:00 en adelante - FILTRO ESTRICTO
+            $cutoffDate = date('Y-m-d 00:00:00');
+            $whereParts[] = "DATE(match_date) >= DATE(?)";
+            $params[] = $cutoffDate;
+        }
         
         if (!empty($allowedPatterns)) {
             $conditions = [];
@@ -332,16 +358,22 @@ function handleGetMatches() {
         
         $whereClause = 'WHERE ' . implode(' AND ', $whereParts);
         
-        // Orden: vivos primero, luego programados, luego fecha ascendente
-        $sql = "SELECT * FROM matches $whereClause 
-                ORDER BY 
-                    CASE 
-                        WHEN status = 'LIVE' THEN 1
-                        WHEN status = 'SCHEDULED' THEN 2
-                        ELSE 3
-                    END,
-                    match_date ASC
-                LIMIT 200";
+        if ($mode === 'live') {
+            $sql = "SELECT * FROM matches $whereClause 
+                    ORDER BY match_date ASC
+                    LIMIT 200";
+        } else {
+            // Orden: vivos primero, luego programados, luego fecha ascendente
+            $sql = "SELECT * FROM matches $whereClause 
+                    ORDER BY 
+                        CASE 
+                            WHEN status = 'LIVE' THEN 1
+                            WHEN status = 'SCHEDULED' THEN 2
+                            ELSE 3
+                        END,
+                        match_date ASC
+                    LIMIT 200";
+        }
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
@@ -355,8 +387,8 @@ function handleGetMatches() {
 }
 
 /**
- * Obtiene partidos históricos (solo últimos 7 días, excluyendo hoy)
- * FILTRO ESTRICTO: solo partidos pasados de los últimos 7 días
+ * Obtiene partidos históricos.
+ * Rango: últimos N días (excluyendo hoy). N entre 7 y 30, default 30.
  */
 function handleGetMatchesHistory() {
     try {
@@ -366,8 +398,12 @@ function handleGetMatchesHistory() {
         $allowedPatterns = defined('ALLOWED_LEAGUE_PATTERNS') ? ALLOWED_LEAGUE_PATTERNS : [];
         $excludedPatterns = defined('EXCLUDED_LEAGUE_PATTERNS') ? EXCLUDED_LEAGUE_PATTERNS : [];
         
-        // Últimos 7 días hacia atrás, excluyendo hoy
-        $startDate = date('Y-m-d 00:00:00', strtotime('-7 days'));
+        $days = isset($_GET['days']) ? (int)$_GET['days'] : 30;
+        if ($days < 7) $days = 7;
+        if ($days > 30) $days = 30;
+
+        // Últimos N días hacia atrás, excluyendo hoy
+        $startDate = date('Y-m-d 00:00:00', strtotime("-$days days"));
         $endDate = date('Y-m-d 23:59:59', strtotime('-1 day'));
         
         // Filtrar estrictamente: solo partidos pasados de los últimos 7 días
@@ -405,6 +441,34 @@ function handleGetMatchesHistory() {
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['status' => 'error', 'error' => 'Error al obtener partidos históricos: ' . $e->getMessage(), 'matches' => []]);
+    }
+}
+
+/**
+ * Obtiene partidos en vivo ya sincronizados en la base.
+ */
+function handleGetLiveMatches() {
+    try {
+        require_once __DIR__ . '/config.php';
+        $pdo = getConnection();
+
+        $startDate = date('Y-m-d 00:00:00', strtotime('-1 day'));
+        $endDate = date('Y-m-d 23:59:59', strtotime('+1 day'));
+
+        $stmt = $pdo->prepare("
+            SELECT * FROM matches 
+            WHERE status = 'LIVE' 
+              AND match_date BETWEEN ? AND ?
+            ORDER BY match_date ASC
+            LIMIT 200
+        ");
+        $stmt->execute([$startDate, $endDate]);
+        $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode(['status' => 'ok', 'matches' => $matches ?: []]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'error' => 'Error al obtener partidos en vivo: ' . $e->getMessage(), 'matches' => []]);
     }
 }
 
@@ -553,6 +617,142 @@ function handleSyncMatches() {
     echo json_encode([
         'status' => 'ok', 
         'message' => "Sincronizados $inserted partidos nuevos y actualizados $updated partidos existentes"
+    ]);
+}
+
+/**
+ * Sincroniza solo partidos en vivo usando el endpoint live de la API.
+ */
+function handleSyncLiveMatches() {
+    require_once __DIR__ . '/config.php';
+
+    if (!function_exists('curl_init')) {
+        throw new Exception('cURL no está disponible en este servidor');
+    }
+
+    $pdo = getConnection();
+    $allowedPatterns = defined('ALLOWED_LEAGUE_PATTERNS') ? ALLOWED_LEAGUE_PATTERNS : [];
+    $excludedPatterns = defined('EXCLUDED_LEAGUE_PATTERNS') ? EXCLUDED_LEAGUE_PATTERNS : [];
+
+    $url = API_FOOTBALL_BASE_URL . '/fixtures?live=all';
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'x-rapidapi-key: ' . API_FOOTBALL_KEY,
+        'x-rapidapi-host: v3.football.api-sports.io'
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($response === false) {
+        throw new Exception('Error en petición cURL: ' . curl_error($ch));
+    }
+    curl_close($ch);
+
+    if ($httpCode !== 200) {
+        throw new Exception("Respuesta HTTP inesperada al obtener live matches: $httpCode");
+    }
+
+    $data = json_decode($response, true);
+    if (!$data || !isset($data['response'])) {
+        throw new Exception('Respuesta inválida al obtener live matches');
+    }
+
+    $matches = [];
+    foreach ($data['response'] as $fixture) {
+        $leagueName = ($fixture['league']['name'] ?? 'Liga') . (isset($fixture['league']['country']) ? ' - ' . $fixture['league']['country'] : '');
+
+        // Filtros de ligas permitidas/excluidas
+        if (!empty($allowedPatterns)) {
+            $allowed = false;
+            foreach ($allowedPatterns as $pattern) {
+                if (stripos($leagueName, $pattern) !== false) {
+                    $allowed = true;
+                    break;
+                }
+            }
+            if (!$allowed) {
+                continue;
+            }
+        }
+        if (!empty($excludedPatterns)) {
+            $excluded = false;
+            foreach ($excludedPatterns as $pattern) {
+                if (stripos($leagueName, $pattern) !== false) {
+                    $excluded = true;
+                    break;
+                }
+            }
+            if ($excluded) {
+                continue;
+            }
+        }
+
+        $status = mapStatus($fixture['fixture']['status']['short'] ?? 'NS');
+        $matchTimestamp = $fixture['fixture']['timestamp'] ?? null;
+        $matchDate = $matchTimestamp ? date('Y-m-d H:i:s', $matchTimestamp) : date('Y-m-d H:i:s');
+
+        $matches[] = [
+            'api_match_id' => (string)$fixture['fixture']['id'],
+            'home_team' => $fixture['teams']['home']['name'],
+            'away_team' => $fixture['teams']['away']['name'],
+            'home_score' => isset($fixture['goals']['home']) && $fixture['goals']['home'] !== null ? (int)$fixture['goals']['home'] : null,
+            'away_score' => isset($fixture['goals']['away']) && $fixture['goals']['away'] !== null ? (int)$fixture['goals']['away'] : null,
+            'status' => $status,
+            'match_date' => $matchDate,
+            'competition' => $leagueName
+        ];
+    }
+
+    if (empty($matches)) {
+        echo json_encode(['status' => 'ok', 'message' => 'No hay partidos en vivo en la API en este momento']);
+        return;
+    }
+
+    // Upsert
+    $inserted = 0;
+    $updated = 0;
+
+    foreach ($matches as $match) {
+        $stmt = $pdo->prepare('SELECT id FROM matches WHERE api_match_id = ?');
+        $stmt->execute([$match['api_match_id']]);
+        $existing = $stmt->fetch();
+
+        if ($existing) {
+            $stmt = $pdo->prepare('
+                UPDATE matches 
+                SET home_team = ?, away_team = ?, home_score = ?, away_score = ?, 
+                    status = ?, match_date = ?, competition = ?
+                WHERE api_match_id = ?
+            ');
+            $stmt->execute([
+                $match['home_team'], $match['away_team'], $match['home_score'],
+                $match['away_score'], $match['status'], $match['match_date'],
+                $match['competition'], $match['api_match_id']
+            ]);
+            $updated++;
+        } else {
+            $stmt = $pdo->prepare('
+                INSERT INTO matches 
+                (api_match_id, home_team, away_team, home_score, away_score, status, match_date, competition, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ');
+            $stmt->execute([
+                $match['api_match_id'], $match['home_team'], $match['away_team'],
+                $match['home_score'], $match['away_score'], $match['status'],
+                $match['match_date'], $match['competition'], date('Y-m-d H:i:s')
+            ]);
+            $inserted++;
+        }
+    }
+
+    echo json_encode([
+        'status' => 'ok',
+        'message' => "Sincronizados $inserted partidos en vivo y actualizados $updated"
     ]);
 }
 
@@ -745,9 +945,13 @@ function handleSyncMatchesHistory() {
     $pdo = getConnection();
     $allMatches = [];
     
-    // Últimos 7 días (ayer hacia atrás)
+    // Últimos N días (ayer hacia atrás). N entre 7 y 30, default 30.
+    $daysParam = isset($_GET['days']) ? (int)$_GET['days'] : 30;
+    if ($daysParam < 7) $daysParam = 7;
+    if ($daysParam > 30) $daysParam = 30;
+
     $daysToFetch = [];
-    for ($i = 1; $i <= 7; $i++) {
+    for ($i = 1; $i <= $daysParam; $i++) {
         $daysToFetch[] = date('Y-m-d', strtotime("-$i days"));
     }
     

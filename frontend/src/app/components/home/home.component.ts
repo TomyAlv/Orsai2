@@ -905,11 +905,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showLiveMatches = false;
     this.liveMatches = [];
     
-    this.api.syncMatches().subscribe({
+    this.api.syncLiveMatches().subscribe({
       next: () => {
-        this.api.getMatches().subscribe({
+        this.api.getLiveMatches().subscribe({
           next: (response) => {
-            this.liveMatches = (response.matches || []).filter((m: any) => m.status === 'LIVE');
+            this.liveMatches = response.matches || [];
             this.loadingLive = false;
             this.syncing = false;
             this.showLiveMatches = true;

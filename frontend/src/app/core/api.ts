@@ -112,9 +112,9 @@ export class ApiService {
     );
   }
 
-  getMatchesHistory(): Observable<{ status: string; matches: Match[] }> {
+  getMatchesHistory(days = 30): Observable<{ status: string; matches: Match[] }> {
     return this.http.get<{ status: string; matches: Match[] }>(
-      `${this.baseUrl}/index.php?action=matches-history`
+      `${this.baseUrl}/index.php?action=matches-history&days=${days}`
     );
   }
 
@@ -128,8 +128,21 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/index.php?action=sync-matches`, {});
   }
 
-  syncMatchesHistory(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/index.php?action=sync-matches-history`, {});
+  syncMatchesHistory(days = 30): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/index.php?action=sync-matches-history&days=${days}`,
+      {}
+    );
+  }
+
+  getLiveMatches(): Observable<{ status: string; matches: Match[] }> {
+    return this.http.get<{ status: string; matches: Match[] }>(
+      `${this.baseUrl}/index.php?action=live-matches`
+    );
+  }
+
+  syncLiveMatches(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/index.php?action=sync-live-matches`, {});
   }
 
   getComments(matchId: number): Observable<{ status: string; comments: Comment[] }> {

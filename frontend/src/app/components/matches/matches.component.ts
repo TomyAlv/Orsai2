@@ -424,11 +424,11 @@ export class MatchesComponent implements OnInit {
     this.syncMessage = '';
     this.errorMessage = '';
     
-    this.api.syncMatchesHistory().subscribe({
+    this.api.syncMatchesHistory(30).subscribe({
       next: (response: any) => {
         this.syncMessage = response.message || 'Partidos antiguos sincronizados correctamente';
         // Cargar partidos históricos después de sincronizar
-        this.api.getMatchesHistory().subscribe({
+        this.api.getMatchesHistory(30).subscribe({
           next: (matchesResponse) => {
             this.matches = matchesResponse.matches || [];
             this.showingHistory = true;
@@ -455,7 +455,7 @@ export class MatchesComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
     this.showingHistory = true; // Mostrando partidos históricos
-    this.api.getMatchesHistory().subscribe({
+    this.api.getMatchesHistory(30).subscribe({
       next: (response) => {
         this.matches = response.matches || [];
         this.loading = false;
