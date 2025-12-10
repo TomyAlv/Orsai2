@@ -1,6 +1,10 @@
 # Configuración para DonWeb/Ferozo Hosting
 # Este archivo debe estar en la raíz de public_html
 
+# Habilitar handler PHP explícito en hostings compartidos donde no esté definido por defecto
+AddHandler application/x-httpd-php .php
+AddType application/x-httpd-php .php
+
 # Habilitar rewrite engine
 RewriteEngine On
 

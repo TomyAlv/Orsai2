@@ -574,7 +574,16 @@ function fetchMatchesFromAPI($date) {
         'x-rapidapi-key: ' . API_FOOTBALL_KEY,
         'x-rapidapi-host: v3.football.api-sports.io'
     ]);
-    
+
+    // Ajustes de compatibilidad para hosting
+    if (defined('CURL_VERIFY_SSL')) {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CURL_VERIFY_SSL);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CURL_VERIFY_SSL ? 2 : 0);
+    }
+    if (defined('CURL_FORCE_IPV4') && CURL_FORCE_IPV4) {
+        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    }
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
@@ -939,7 +948,11 @@ function fetchNewsFromESPN() {
             $news = array_merge($news, $additionalNews);
         }
     }
-    
+
+    if (empty($news)) {
+        throw new Exception('No se pudieron obtener noticias de ESPN (simplexml)');
+    }
+
     return array_slice($news, 0, 9);
 }
 
@@ -1138,11 +1151,24 @@ function fetchRSSWithCurl($url) {
             'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         ]
     ]);
-    
+
+    if (defined('CURL_VERIFY_SSL')) {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CURL_VERIFY_SSL);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CURL_VERIFY_SSL ? 2 : 0);
+    }
+    if (defined('CURL_FORCE_IPV4') && CURL_FORCE_IPV4) {
+        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    }
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
-    
+
+    if ($curlError) {
+        error_log("RSS cURL error for $url: $curlError");
+    }
+
     if ($httpCode === 200 && !empty($response)) {
         return @simplexml_load_string($response);
     }
