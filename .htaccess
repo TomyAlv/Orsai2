@@ -12,7 +12,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 # Excepto las rutas que empiezan con /api
 RewriteRule ^(?!api/).*$ index.html [L]
 
-# Permitir acceso a la API
+# Permitir acceso a la API - debe estar ANTES de la regla de index.html
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteRule ^api/(.*)$ api/index.php [QSA,L]
 
