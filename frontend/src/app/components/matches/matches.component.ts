@@ -46,10 +46,10 @@ import { finalize } from 'rxjs/operators';
               <i *ngIf="!syncing" class="bi bi-arrow-clockwise me-2"></i>
               {{ syncing ? 'Sincronizando...' : 'Sincronizar' }}
             </button>
-            <button *ngIf="!showingHistory" class="btn btn-outline-light btn-sm" (click)="loadMatchesHistory()" [disabled]="loading" style="min-width: 180px;">
-              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem; border-width: 0.15em;"></span>
-              <i *ngIf="!loading" class="bi bi-clock-history me-2"></i>
-              {{ loading ? 'Cargando...' : 'Ver partidos antiguos (7 días)' }}
+            <button *ngIf="!showingHistory" class="btn btn-outline-light btn-sm" (click)="loadMatchesHistory()" [disabled]="loadingHistory || syncing" style="min-width: 200px;">
+              <span *ngIf="loadingHistory" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem; border-width: 0.15em;"></span>
+              <i *ngIf="!loadingHistory" class="bi bi-clock-history me-2"></i>
+              {{ loadingHistory ? 'Cargando antiguos...' : 'Ver partidos antiguos (30 días)' }}
             </button>
             <button *ngIf="showingHistory" class="btn btn-outline-light btn-sm" (click)="syncMatchesHistory()" [disabled]="syncingHistory" style="min-width: 180px;">
               <span *ngIf="syncingHistory" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem; border-width: 0.15em;"></span>
@@ -90,7 +90,7 @@ import { finalize } from 'rxjs/operators';
             <p class="text-muted">Sigue las mejores ligas del mundo</p>
           </div>
           <div *ngIf="showingHistory" class="alert alert-info mb-0">
-            <i class="bi bi-clock-history me-2"></i>Mostrando partidos antiguos (últimos 7 días)
+            <i class="bi bi-clock-history me-2"></i>Mostrando partidos antiguos (últimos 30 días)
           </div>
         </div>
       </div>
@@ -111,7 +111,11 @@ import { finalize } from 'rxjs/operators';
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
           <span class="visually-hidden">Cargando...</span>
         </div>
-        <p class="mt-3 text-muted">Cargando partidos...</p>
+        <p class="mt-3 text-muted">
+          {{ showingHistory 
+              ? 'Cargando partidos antiguos (puedes sincronizar si falta información).' 
+              : 'Pulsa \"Sincronizar\" para cargar partidos. Si ya sincronizaste, estamos cargando la lista.' }}
+        </p>
       </div>
 
       <!-- Sin partidos -->
@@ -321,6 +325,7 @@ import { finalize } from 'rxjs/operators';
 export class MatchesComponent implements OnInit {
   matches: Match[] = [];
   loading = false;
+  loadingHistory = false;
   syncing = false;
   syncingHistory = false;
   isAuthenticated = false;
@@ -455,10 +460,12 @@ export class MatchesComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
     this.showingHistory = true; // Mostrando partidos históricos
+    this.loadingHistory = true;
     this.api.getMatchesHistory(30).subscribe({
       next: (response) => {
         this.matches = response.matches || [];
         this.loading = false;
+        this.loadingHistory = false;
         this.showingHistory = true;
         if (this.matches.length === 0) {
           this.errorMessage = 'No hay partidos antiguos disponibles. Intenta sincronizar primero.';
@@ -468,6 +475,7 @@ export class MatchesComponent implements OnInit {
         console.error('Error al cargar partidos históricos:', error);
         this.errorMessage = error.error?.error || error.message || 'Error al cargar los partidos antiguos.';
         this.loading = false;
+        this.loadingHistory = false;
         this.matches = [];
         this.showingHistory = false;
       }
