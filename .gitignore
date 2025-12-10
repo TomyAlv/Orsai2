@@ -1,12 +1,19 @@
 # Node modules (muy pesado, se instala con npm install)
 frontend/node_modules/
 node_modules/
+**/node_modules/
 
 # Build outputs (se generan al compilar)
 frontend/dist/
 dist/
+**/dist/
 *.js.map
 *.css.map
+
+# Angular cache
+frontend/.angular/
+.angular/
+**/.angular/
 
 # Base de datos (se crea al ejecutar init_db.php)
 db/*.sqlite

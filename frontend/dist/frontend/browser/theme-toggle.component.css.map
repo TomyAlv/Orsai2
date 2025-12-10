@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/components/theme-toggle/theme-toggle.component.ts"],
-  "sourcesContent": ["\n    .theme-toggle-btn {\n      position: fixed;\n      bottom: 20px;\n      right: 20px;\n      width: 50px;\n      height: 50px;\n      border-radius: 50%;\n      border: none;\n      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n      color: white;\n      font-size: 1.5rem;\n      cursor: pointer;\n      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);\n      z-index: 1000;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      transition: transform 0.3s, box-shadow 0.3s;\n    }\n    .theme-toggle-btn:hover {\n      transform: scale(1.1);\n      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);\n    }\n    .theme-toggle-btn:active {\n      transform: scale(0.95);\n    }\n    .dark-theme .theme-toggle-btn {\n      background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);\n    }\n  "],
-  "mappings": ";AACI,CAAA;AACE,YAAA;AACA,UAAA;AACA,SAAA;AACA,SAAA;AACA,UAAA;AACA,iBAAA;AACA,UAAA;AACA;IAAA;MAAA,MAAA;MAAA,QAAA,EAAA;MAAA,QAAA;AACA,SAAA;AACA,aAAA;AACA,UAAA;AACA,cAAA,EAAA,IAAA,KAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;AACA,WAAA;AACA,WAAA;AACA,eAAA;AACA,mBAAA;AACA,cAAA,UAAA,IAAA,EAAA,WAAA;;AAEF,CAnBA,gBAmBA;AACE,aAAA,MAAA;AACA,cAAA,EAAA,IAAA,KAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;AAEF,CAvBA,gBAuBA;AACE,aAAA,MAAA;;AAEF,CAAA,WAAA,CA1BA;AA2BE;IAAA;MAAA,MAAA;MAAA,QAAA,EAAA;MAAA,QAAA;;",
-  "names": []
-}
