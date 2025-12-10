@@ -52,3 +52,4 @@ RewriteRule ^api/(.*)$ api/index.php [QSA,L]
 # Prevenir listado de directorios
 Options -Indexes
 
+
