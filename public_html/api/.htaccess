@@ -1,6 +1,10 @@
 # Configuración para la carpeta API
 # Permite acceso a archivos PHP y configura CORS
 
+# Forzar handler PHP en entornos donde no esté habilitado por defecto
+AddHandler application/x-httpd-php .php
+AddType application/x-httpd-php .php
+
 # Permitir acceso a archivos PHP
 <FilesMatch "\.php$">
     SetHandler application/x-httpd-php

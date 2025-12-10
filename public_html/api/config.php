@@ -19,6 +19,13 @@ define('API_FOOTBALL_BASE_URL', 'https://v3.football.api-sports.io');
 // Configuración de ESPN (para noticias de fútbol)
 define('ESPN_BASE_URL', 'https://site.api.espn.com');
 
+// Configuración de cURL para entornos de hosting con certificados/SNI limitados
+// En algunos servidores compartidos las conexiones HTTPS externas fallan si se
+// verifica el certificado. Se desactiva la verificación para garantizar que
+// las APIs externas respondan (API-Football y feeds de ESPN).
+define('CURL_VERIFY_SSL', false);
+define('CURL_FORCE_IPV4', true);
+
 /**
  * Ligas permitidas - formato: ['nombre_liga' => 'país']
  * Se usa para filtrar partidos en fetchMatchesFromAPI()
