@@ -4,8 +4,11 @@
 # Habilitar rewrite engine
 RewriteEngine On
 
-# IMPORTANTE: Las reglas de API deben estar ANTES de las reglas de Angular
+# Forzar que PHP se ejecute en todo el sitio (incluida /api/)
+AddHandler application/x-httpd-php .php
+AddType application/x-httpd-php .php
 
+# IMPORTANTE: Las reglas de API deben estar ANTES de las reglas de Angular
 # Permitir acceso directo a archivos PHP en /api/
 RewriteCond %{REQUEST_URI} ^/api/.*\.php$
 RewriteRule ^api/(.*\.php)$ api/$1 [L]

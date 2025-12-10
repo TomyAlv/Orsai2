@@ -1,38 +1,13 @@
-# Configuración para la carpeta API
-# Permite acceso a archivos PHP y configura CORS
-
-# Asegurar que PHP se ejecute
+# Configuración mínima para asegurar ejecución de PHP en /api/
 AddHandler application/x-httpd-php .php
+AddType application/x-httpd-php .php
+Options -Indexes
 
-# Permitir acceso a archivos PHP
-<FilesMatch "\.php$">
-    SetHandler application/x-httpd-php
-</FilesMatch>
-
-# CORS - Ajustar según tu dominio en producción
+# CORS básico
 <IfModule mod_headers.c>
-    # Permitir desde cualquier origen (ajustar en producción)
     Header set Access-Control-Allow-Origin "*"
     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header set Access-Control-Allow-Headers "Content-Type, Authorization"
-    
-    # Manejar preflight requests
-    RewriteEngine On
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^(.*)$ $1 [R=200,L]
 </IfModule>
-
-# Denegar acceso a archivos sensibles
-<FilesMatch "^(config|db|jwt)\.php$">
-    Deny from all
-</FilesMatch>
-
-# Proteger archivos de base de datos
-<FilesMatch "\.(sqlite|db|log)$">
-    Deny from all
-</FilesMatch>
-
-# Prevenir listado de directorios
-Options -Indexes
 
 
