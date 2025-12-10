@@ -4,17 +4,19 @@
 # Habilitar rewrite engine
 RewriteEngine On
 
+# IMPORTANTE: Las reglas de API deben estar ANTES de las reglas de Angular
+
+# Permitir acceso a la API - procesar ANTES de Angular routing
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ api/index.php?%{QUERY_STRING} [QSA,L]
+
 # Si el archivo o directorio existe, servirlo directamente
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # Redirigir todas las rutas a index.html (para Angular routing)
-# Excepto las rutas que empiezan con /api
+# Excepto las rutas que empiezan con /api (ya procesadas arriba)
 RewriteRule ^(?!api/).*$ index.html [L]
-
-# Permitir acceso a la API - debe estar ANTES de la regla de index.html
-RewriteCond %{REQUEST_URI} ^/api/
-RewriteRule ^api/(.*)$ api/index.php [QSA,L]
 
 # Configuración de seguridad
 <FilesMatch "\.(sqlite|db|log|bak)$">

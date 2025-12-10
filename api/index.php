@@ -18,7 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$action = $_GET['action'] ?? 'ping';
+// Obtener action de query string o de PATH_INFO
+$action = $_GET['action'] ?? null;
+if (!$action && isset($_SERVER['PATH_INFO'])) {
+    $pathInfo = trim($_SERVER['PATH_INFO'], '/');
+    if (!empty($pathInfo)) {
+        $action = $pathInfo;
+    }
+}
+$action = $action ?? 'ping';
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
